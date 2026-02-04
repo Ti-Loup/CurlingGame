@@ -10,4 +10,7 @@ enum class ECameraState : uint8 {
 	FollowPlayer UMETA(DisplayName = "Follow Player"),
 	FollowStone  UMETA(DisplayName = "Follow Stone")//suit la pierre quand le joueur la lance
 
+	//FollowPlayer = 0 
+	//FollowStone = 1
+
 };

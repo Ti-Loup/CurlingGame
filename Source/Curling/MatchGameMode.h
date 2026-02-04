@@ -17,6 +17,12 @@ enum class EMatchPhase : uint8
 	Playing,     // tour de chacun de jouer
 	BetweenEnds, // fin de manche/libre dans la map
 	Ended        // match fini
+
+    /* Warmup -> 0
+       Playing -> 1
+       BetweenEnds ->2
+       Ended -> 3
+    */
 };
 
 //enumeration pour montrer les equipes bleu et rouge
@@ -26,6 +32,9 @@ enum class ETeam : uint8
 {
 	Blue,
 	Red
+
+    //Blue -> 0
+    //Red -> 1
 };
 //Enumeration pour choisir entre match de 4 bouts ou 10
 
@@ -34,6 +43,9 @@ enum class EMatchLength : uint8
 {
 	Short UMETA(DisplayName = "4 Bouts"),
 	Long  UMETA(DisplayName = "10 Bouts")
+
+    //Short ->0
+    //Long ->1
 };
 
 UCLASS()

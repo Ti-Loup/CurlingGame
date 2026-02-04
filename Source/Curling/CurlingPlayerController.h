@@ -19,6 +19,9 @@ enum class EPlayerState : uint8
     InHack      UMETA(DisplayName = "In Hack"),
     Sweeping   UMETA(DisplayName = "Sweeping")
 
+    //FreeMove -> 0 
+    //InHack -> 1
+    //Sweeping ->2
 };
 
 UCLASS()
@@ -31,7 +34,7 @@ protected:
     virtual void BeginPlay() override;
 
 public:
-    virtual void SetupInputComponent() override;
+    virtual void SetupInputComponent() override;//pourait etre delete
     void TryLaunchStone();
    
     //etat du joueur
@@ -60,8 +63,6 @@ public:
     TSubclassOf<class ARockBase> RockClassToSpawn;
     
 
-    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
-    UInputMappingContext* IMC_Player;
 
     
 };

@@ -21,26 +21,27 @@ AHackActor::AHackActor()
     InteractionBox->SetupAttachment(RootComponent);
     InteractionBox->SetCollisionProfileName(TEXT("Trigger"));
 
-    InteractionBox->OnComponentBeginOverlap.AddDynamic(this, &AHackActor::OnOverlapBegin);
+    InteractionBox->OnComponentBeginOverlap.AddDynamic(this, &AHackActor::OnOverlapBegin);//Overlap entre l'adresse de l'actor et InteractionBox
     InteractionBox->OnComponentEndOverlap.AddDynamic(this, &AHackActor::OnOverlapEnd);
 }
 
+//Fonction quand il y a contact entre collisions hack et personnage
 void AHackActor::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
     // On verifie si c'est un Pawn qui rentre dans la zone du hack (box collider)
     APawn* PlayerPawn = Cast<APawn>(OtherActor);
     if (PlayerPawn)
     {
-        // 2. On récupère son Controller
-        ACurlingPlayerController* PC = Cast<ACurlingPlayerController>(PlayerPawn->GetController());
+        // recupere son Controller
+        ACurlingPlayerController* PlayerController = Cast<ACurlingPlayerController>(PlayerPawn->GetController());
 
-        if (PC)
+        if (PlayerController)
         {
             bPlayerInRange = true;
-            PC->CurrentHack = this; // On dit au controller quel hack il utilise
+            PlayerController->CurrentHack = this; // On dit au controller quel hack il utilise, 
 
             //TryLaunchStone qui vient du CurlingPlayerController.cpp
-            PC->TryLaunchStone();
+            PlayerController->TryLaunchStone();
 
             GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Cyan, TEXT("Hack : Joueur détecté !"));
         }
@@ -52,12 +53,11 @@ void AHackActor::OnOverlapEnd(
     AActor* OtherActor,
     UPrimitiveComponent*,
     int32)
-{
-    if (ACurlingPlayerController* PC =
-        Cast<ACurlingPlayerController>(OtherActor->GetInstigatorController()))
+{               //On prend l'adresse de l'acteur et on demande de trouver son InstigatorController(lui qu'il controlle) et de le cast au Playercontroller
+    if (ACurlingPlayerController* PlayerControl = Cast<ACurlingPlayerController>(OtherActor->GetInstigatorController()))
     {
-        bPlayerInRange = false;
-        PC->CurrentHack = nullptr;
+        bPlayerInRange = false;//On remet la variable a false
+        PlayerControl->CurrentHack = nullptr;
     }
 
 }

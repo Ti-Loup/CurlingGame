@@ -14,18 +14,10 @@
 void ACurlingPlayerController::BeginPlay()
 {
     Super::BeginPlay();
-
-    if (ULocalPlayer* LP = GetLocalPlayer())
-    {
-        if (UEnhancedInputLocalPlayerSubsystem* Subsystem =
-            LP->GetSubsystem<UEnhancedInputLocalPlayerSubsystem>())
-        {
-            Subsystem->ClearAllMappings();
-            Subsystem->AddMappingContext(IMC_Player, 0);
-        }
-    }
+   
 }
-//input F pour interagir avec le hack
+//Pourrait etre supprimer
+// Les inputs sont dans le PlayerController
 void ACurlingPlayerController::SetupInputComponent()
 {
     
@@ -34,20 +26,24 @@ void ACurlingPlayerController::SetupInputComponent()
 
 void ACurlingPlayerController::TryLaunchStone()//modifier pour corriger le bug
 {
-    APlayerCharacter* MyChar = Cast<APlayerCharacter>(GetPawn());
+    //On recherche notre personnage:  GetPawn -> cast qui verifie que c'est bien le joueur
+    APlayerCharacter* PersonnnageChar = Cast<APlayerCharacter>(GetPawn());//1 byte
 
-    // Si pas de hack ou pas de perso, on annule
-    if (!MyChar || !CurrentHack) return;
+    // Si pas de hack ou pas de perso, on annule et on ne lance pas de pierre
+    if (!PersonnnageChar || !CurrentHack) return;
 
     
-    // Si CurrentStone est vide (null), on en fait apparaître une pierre
+    // Si CurrentStone est vide (nullptr), on en fait apparaître une pierre
     if (CurrentStone == nullptr)
     {
+        //RockClassToSpawn est une sous-classe permettant de faire spawn une pierre devant lui
         if (RockClassToSpawn) // On vérifie qu'on a bien choisi un Blueprint
         {
+            //creation d'un vector de type float + Ou est ce que le hack regarde vers. 
+
             FVector SpawnLoc = CurrentHack->GetActorLocation() + FVector(60, 25, 0); // Un peu au-dessus du hack
-            FRotator SpawnRot = CurrentHack->GetActorRotation();
-            FActorSpawnParameters SpawnParams;
+            FRotator SpawnRot = CurrentHack->GetActorRotation();//(Pitch, Yaw, Roll) pour l'orientation du hack
+            FActorSpawnParameters SpawnParams;//parametre de base
 
             //SpawnActor de la pierre (Faire apparaitre)
             CurrentStone = GetWorld()->SpawnActor<ARockBase>(RockClassToSpawn, SpawnLoc, SpawnRot, SpawnParams);
@@ -66,7 +62,7 @@ void ACurlingPlayerController::TryLaunchStone()//modifier pour corriger le bug
     if (CurrentStone)
     {
         
-        MyChar->CurrentRock = CurrentStone;
+        PersonnnageChar->CurrentRock = CurrentStone;
         CurrentPlayerState = EPlayerState::InHack;
         GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Cyan, TEXT("Pierre donnée au joueur !"));
     }
@@ -82,7 +78,7 @@ void ACurlingPlayerController::SetCameraFollowPlayer() {
 }
 
 //Camera qui suit la pierre lorsque lancer
-void ACurlingPlayerController::SetCameraFollowStone(AActor* Stone)
+void ACurlingPlayerController::SetCameraFollowStone(AActor* Stone)//On passe l'adresse de (l'actor de la pierre) a sa fonction
 {
     if (!Stone) return;//exit si pas de pierre
 

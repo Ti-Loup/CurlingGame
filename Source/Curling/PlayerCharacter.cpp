@@ -225,7 +225,7 @@ void APlayerCharacter::InteractCharge() {
 	//si il y a une pierre actuelle dans le niveau alors il commence a charger
 	if (CurrentRock) {
 		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("SA FONCTIONNE "));
-		CurrentRock->StartCharging();
+		CurrentRock->StartCharging();//appel fonction startCharging de RockBase
 	 }
 	else {
 		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("nop ?"));
@@ -236,24 +236,24 @@ void APlayerCharacter::InteractCharge() {
 //Lorsque le joueur arrete d'apuier alors cela s'arrete et pierre lancer
 void APlayerCharacter::InteractStopCharge() {
 	if (CurrentRock) {
-		CurrentRock->StopCharging();
+		CurrentRock->StopCharging();//appel fonction stopCharging de RockBase
 
 		CurrentRock = nullptr;
 
-		if (ACurlingPlayerController* PC = Cast<ACurlingPlayerController>(GetController())) {
-			PC->SetCameraFollowStone(PC->CurrentStone);
+		if (ACurlingPlayerController* PlayerController = Cast<ACurlingPlayerController>(GetController())) {
+			PlayerController->SetCameraFollowStone(PlayerController->CurrentStone);
 		}
 	}
 }
 //Pour ajuster la rotation en fonction de mon switch dans RockBase
-void APlayerCharacter::AdjustRotation(const FInputActionValue& Value)
+void APlayerCharacter::AdjustRotation(const FInputActionValue& Value)//reference
 {
 	// On récupère la valeur (1.0 = Haut, -1.0 = Bas)
 	float Direction = Value.Get<float>();
 
-	if (CurrentRock && !CurrentRock->bIsSliding)
+	if (CurrentRock && !CurrentRock->bIsSliding)//bSliding -> false
 	{
-		// --- MOLETTE VERS LE HAUT (Direction > 0) ---
+		// Molette vers le haut (Direction > 0) 
 		if (Direction > 0 && CurrentRock->RotationVelocity < 4)
 		{
 			CurrentRock->RotationVelocity++;

@@ -22,7 +22,7 @@ AMatchGameMode::AMatchGameMode()
 void AMatchGameMode::BeginPlay()
 {
     Super::BeginPlay();
-    MatchPhase = EMatchPhase::Warmup;
+    MatchPhase = EMatchPhase::Warmup;//Mo dew libre au depart
     
     // Cherche l'acteur ZoneMaison qui est placé dans ta carte
     AActor* FoundActor = UGameplayStatics::GetActorOfClass(GetWorld(), AZoneMaison::StaticClass());
@@ -32,7 +32,7 @@ void AMatchGameMode::BeginPlay()
         // objet trouver assigner a la variable
         ZoneMaison = Cast<AZoneMaison>(FoundActor);
 
-        if (ZoneMaison)
+        if (ZoneMaison)//Verifier que la zonemaison est bien connecte avec un debugmessage
         {
             GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("Zone Maison connectée au GameMode"));
         }
@@ -45,6 +45,7 @@ void AMatchGameMode::BeginPlay()
     //Pour qui a le marteau 
     HammerTeam = FlipCoin();
 
+    //message pour dire qui commence 
     if (HammerTeam == ETeam::Blue)
     {
         GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("L'equipe Bleue a le marteau !"));
@@ -59,7 +60,7 @@ void AMatchGameMode::BeginPlay()
 
 
 
-//Fonction FlipCoin()
+//Fonction FlipCoin() called au beginplay
 ETeam AMatchGameMode::FlipCoin()
 {
     return (FMath::RandRange(0, 1) == 0) ? ETeam::Blue : ETeam::Red;
@@ -93,10 +94,10 @@ void AMatchGameMode::StartEnd() {
         : ETeam::Blue;
 }
 
-//apres qu'une pierre est lancé
+//apres qu'une pierre est lancé 
 void AMatchGameMode::OnStonePlayed()
 {
-    StonesPlayedThisEnd++;
+    StonesPlayedThisEnd++; //0 de base 16 max
 
     // Changer d'équipe après chaque pierre
     CurrentTeam = (CurrentTeam == ETeam::Blue) ? ETeam::Red : ETeam::Blue;
@@ -105,7 +106,7 @@ void AMatchGameMode::OnStonePlayed()
     if (StonesPlayedThisEnd >= StonesPerTeam * 2)
     {
         MatchPhase = EMatchPhase::BetweenEnds;
-        HandleBetweenEnds();
+        HandleBetweenEnds();//fonction appeler
     }
 }
 
@@ -147,8 +148,6 @@ void AMatchGameMode::HandleBetweenEnds()
         TEXT("Fin du bout")
     );
 
-    
-    
    
     int32 BluePoints = 0;
     int32 RedPoints = 0;

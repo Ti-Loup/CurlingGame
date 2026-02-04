@@ -64,8 +64,8 @@ void ARockBase::Tick(float DeltaTime)
     float BaseDeceleration = 42.0f;
 
     // avec le switch du nombre de tours choisit
-    // - Si Rotation 4 (Friction 0.10) -> 0.10 * 15 = +1.5 -> Total 41.5 (Freine peu)
-    // - Si Rotation 0 (Friction 1.00) -> 1.00 * 15 = +15  -> Total 55.0 (Freine fort)
+    // Si Rotation 4 (Friction 0.10) -> 0.10 * 15 = +1.5 -> Total 41.5 peu de frein
+    // Si Rotation 0 (Friction 1.00) -> 1.00 * 15 = +15  -> Total 55.0 ford frein
     float SwitchImpact = FrictionValue * 15.0f;
 
     // freinage de base de la glace + la friction de la pierre
@@ -97,16 +97,16 @@ void ARockBase::Tick(float DeltaTime)
     if (Direction.IsNearlyZero()) Direction = GetActorForwardVector();
 
     // Logique du Curl (Virage)
-    if (RotationVelocity >= 0) // On inclut 0 maintenant car ça curl fort
+    if (RotationVelocity >= 0) // On inclut 0 maintenant pour curl fort
     {
         FVector CurlDir = FVector::CrossProduct(Direction, FVector::UpVector);
 
         // valeur de base du curl
         float BaseTurnIntensity = 0.00005f;
 
-        // CALCUL FINAL : Base * Le Sens (+1/-1) * Le Facteur du Switch
-        // Si Rotation 4 -> Curl = 0.05 * 0.5 = 0.025 (Petit virage)
-        // Si Rotation 0 -> Curl = 0.05 * 2.0 = 0.100 (Gros virage)
+        // Base * Le Sens (+1/-1) * Le Facteur du Switch
+        // Si Rotation 4 ->  curl petit
+        // Si Rotation 0 ->  gros curl
         FVector FinalTurn = CurlDir * BaseTurnIntensity * curlSide * CurlRotationFactor;
 
         Direction = (Direction + FinalTurn).GetSafeNormal();
@@ -130,7 +130,7 @@ void ARockBase::NoCurl()
     if (RotationVelocity == 0)
     {
         GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red,
-            TEXT("Lancé non conforme, À l'autre équipe de jouer !"));//texte affiché si il n'y a pas de Rotation sur la pierre
+            TEXT("Lancé non conforme, À l'autre équipe de jouer "));//texte affiché si il n'y a pas de Rotation sur la pierre
     }
 }
 
@@ -212,6 +212,7 @@ void ARockBase::UpdateFrictionFromRotation()
         break;
     }
 }
+
 void ARockBase::NotifyStoneStopped() {
     AMatchGameMode* GameMode = Cast<AMatchGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
 
