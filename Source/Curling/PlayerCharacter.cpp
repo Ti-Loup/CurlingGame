@@ -6,6 +6,7 @@
 #include "EnhancedInputSubsystems.h" 
 #include "RockBase.h"
 #include "BroomBase.h"
+#include "FightingStone.h"
 #include "TimerManager.h"//Pour appuyer sur e et le relacher
 #include "CurlingPlayerController.h"
 #include "GameFramework/SpringArmComponent.h"//Pour La camera SpringArm
