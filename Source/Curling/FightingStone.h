@@ -2,12 +2,13 @@
 
 #pragma once
 
+#include "PickUpObject.h"
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "FightingStone.generated.h"
 
 UCLASS()
-class CURLING_API AFightingStone : public AActor
+class CURLING_API AFightingStone : public APickUpObject
 {
 	GENERATED_BODY()
 	

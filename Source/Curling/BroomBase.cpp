@@ -10,6 +10,8 @@ ABroomBase::ABroomBase()
 {
  	// Set this actor to call Tick() every frame.  
 	PrimaryActorTick.bCanEverTick = false;
+
+	/*
 	//Creation de la mesh
 	BroomMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("BroomMesh"));
 	RootComponent = BroomMesh;
@@ -17,10 +19,11 @@ ABroomBase::ABroomBase()
 	//Simuler physics
 	BroomMesh->SetSimulatePhysics(true);
 	BroomMesh->SetCollisionProfileName(TEXT("PhysicsActor"));
+	*/
 
 	//Box de collision autour du balet
 	InteractionCollision = CreateDefaultSubobject<UBoxComponent>(TEXT("InteractionZoneCollision"));
-	InteractionCollision->SetupAttachment(BroomMesh);
+	InteractionCollision->SetupAttachment(PickUpMesh);
 	//Taille de la collision
 	InteractionCollision->SetBoxExtent(FVector(20.f, 100.f, 20.f));//vector de type float
 	InteractionCollision->SetCollisionProfileName(TEXT("Trigger"));

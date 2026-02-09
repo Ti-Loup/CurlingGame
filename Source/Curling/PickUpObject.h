@@ -2,19 +2,18 @@
 
 #pragma once
 
-#include "PickUpObject.h"
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "BroomBase.generated.h"
+#include "PickUpObject.generated.h"
 
 UCLASS()
-class CURLING_API ABroomBase : public APickUpObject
+class CURLING_API APickUpObject : public AActor
 {
 	GENERATED_BODY()
 	
 public:	
 	// Sets default values for this actor's properties
-	ABroomBase();
+	APickUpObject();
 
 protected:
 	// Called when the game starts or when spawned
@@ -24,12 +23,11 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	
-	//creation mesh broom
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Broom")
-	class UStaticMeshComponent* BroomMesh;
+	// Le Mesh des differents Objets (Balai, Pierre)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UStaticMeshComponent* PickUpMesh;
 
-	//Zone Collision
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Broom")
-	class UBoxComponent* InteractionCollision;
+	// Nom du socket
+	UPROPERTY(EditDefaultsOnly, Category = "Settings")
+	FName SocketName = "Socket_Hand";
 };

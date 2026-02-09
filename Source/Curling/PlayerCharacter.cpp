@@ -7,6 +7,7 @@
 #include "RockBase.h"
 #include "BroomBase.h"
 #include "FightingStone.h"
+#include "PickUpObject.h"
 #include "TimerManager.h"//Pour appuyer sur e et le relacher
 #include "CurlingPlayerController.h"
 #include "GameFramework/SpringArmComponent.h"//Pour La camera SpringArm
@@ -296,6 +297,18 @@ void APlayerCharacter::ToggleCurlSide(const FInputActionValue& Value)
 
 void APlayerCharacter::QuandInteractionAppuyer() {
 	TestInput();
+
+	//Si on a pas d'object (balai, pierre) ->on prend l'object
+	if (!HeldObject) {
+		GrabObject();
+	}
+	else {
+		//Timer pour relacher la pierre
+		GetWorldTimerManager().SetTimer(TimerHandle_DropInteraction, this, &APlayerCharacter::DropObject, 1.0f, false);
+		if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Yellow, TEXT("Maintiens pour lacher"));
+	}
+	//HardCoding
+	/*
 	// Le personnage ne tiens rien -> ramasse de suite
 	if (!HeldBroom)
 	{
@@ -320,6 +333,7 @@ void APlayerCharacter::QuandInteractionAppuyer() {
 		if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Yellow, TEXT("Maintiens pour lâcher"));
 
 	}
+	*/
 }
 
 
@@ -331,14 +345,70 @@ void APlayerCharacter::QuandInteractionRelacher() {
 
 //Fonction pour grab un objet
 void APlayerCharacter::GrabObject() {
+
+	if (HeldObject) return;
+
+		// recherche tous les objets qui overlap dans un array
+		TArray<AActor*> OverlappingActors;
+	GetOverlappingActors(OverlappingActors, APickUpObject::StaticClass());
+
+	
+	for (AActor* Actor : OverlappingActors)
+	{
+		//cast vers la class Parent
+		APickUpObject* ObjetTrouver = Cast<APickUpObject>(Actor);
+		//si object trouver
+		if (ObjetTrouver)
+		{
+
+			// mesh seulement visible sans physics
+			ObjetTrouver->PickUpMesh->SetSimulatePhysics(false);
+			ObjetTrouver->PickUpMesh->SetCollisionProfileName(TEXT("NoCollision"));
+
+			// Attacher au socket
+			ObjetTrouver->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, ObjetTrouver->SocketName);
+
+			// Pour pas que l'objet ramasser est un scale f ait
+			FAttachmentTransformRules AttachmentRules(
+				EAttachmentRule::SnapToTarget,  // Colle au socket 
+				EAttachmentRule::SnapToTarget,  // S'aligne avec le socket
+				EAttachmentRule::KeepWorld,     // Garde la taille qu'il a au sol !
+				true                            // Oui pour la physique
+			);
+
+			//  pour attacher
+			bool bAttached = ObjetTrouver->AttachToComponent(GetMesh(), AttachmentRules, ObjetTrouver->SocketName);
+
+			// Sauvegarder dans la variable generique HeldObject
+			HeldObject = ObjetTrouver;
+
+			if (bAttached)
+			{
+				HeldObject = ObjetTrouver;
+				
+				if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Green, TEXT("SUCCESS : Objet attache !"));
+			}
+			else
+			{
+				if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("ERREUR : Echec de l'attachement (Socket inexistant ?)"));
+			}
+
+			if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Green, TEXT("Objet ramassé !"));
+
+			// On sort de la boucle dès qu'on a pris un objet
+			break;
+		}
+	}
+	//HardCoding
+	/*
 	// Si on tient déjà quelque chose, on ne fait rien 
 	if (HeldBroom) return;
-	if (HeldFightingStone) return;
+	//if (HeldFightingStone) return;
 
 	//creation d'un array vide qui ajoute lorsque il y a contacte entre joueur et les acteurs 
 	TArray<AActor*> OverlappingActors;
 	GetOverlappingActors(OverlappingActors, ABroomBase::StaticClass());
-	GetOverlappingActors(OverlappingActors, AFightingStone::StaticClass());
+	//GetOverlappingActors(OverlappingActors, AFightingStone::StaticClass());
 
 	if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Cyan, TEXT("J'ai trouvé un object"));
 	
@@ -361,6 +431,7 @@ void APlayerCharacter::GrabObject() {
 			if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Green, TEXT("Je tiens le balai"));
 			break;
 		}
+		
 		//Pour tenir la pierre de combat
 		AFightingStone* RamasserLaPierre = Cast<AFightingStone>(Actor);
 		if (RamasserLaPierre) {
@@ -376,28 +447,45 @@ void APlayerCharacter::GrabObject() {
 			if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Green, TEXT("Je tien la pierre"));
 			break;
 		}
-
+		
 	}
-
-
+	*/
 }
 
 void APlayerCharacter::DropObject()
 {
-	// on peut drop un objerct seulement si on a un object dans la main
+	if (HeldObject)
+	{
+		// Detache
+		HeldObject->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+
+		// Remet la physic de l'object
+		HeldObject->PickUpMesh->SetSimulatePhysics(true);
+		HeldObject->PickUpMesh->SetCollisionProfileName(TEXT("PhysicsActor"));
+		HeldObject->PickUpMesh->WakeAllRigidBodies();
+
+		// Petite pousser
+		HeldObject->PickUpMesh->AddImpulse(GetActorForwardVector() * 100.f, NAME_None, true);
+
+		HeldObject = nullptr;
+
+		if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, TEXT("Objet lacher"));
+	}
+	/*
+	Hard Coding trop de if else si beaucoup d'objets
+	 on peut drop un objerct seulement si on a un object dans la main
 	if (HeldBroom)//(HeldBroom = RammaserLeBalais)
 	{
-		//Détacher
+		Détacher
 		HeldBroom->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 
-		//Réactiver la Physique
+		Réactiver la Physique
 		HeldBroom->BroomMesh->SetSimulatePhysics(true);
 
 		HeldBroom->BroomMesh->SetCollisionProfileName(TEXT("PhysicsActor"));
 		HeldBroom->BroomMesh->WakeAllRigidBodies();
 		HeldBroom->BroomMesh->AddImpulse(GetActorForwardVector() * 50.f, NAME_None, true);
 
-		
 		HeldBroom = nullptr;
 	}
 	if (HeldFightingStone) {
@@ -408,8 +496,10 @@ void APlayerCharacter::DropObject()
 		HeldFightingStone->FightingStoneMesh->AddImpulse(GetActorForwardVector() * 50.0f, NAME_None, true);//constexpr Name_None
 
 		HeldFightingStone = nullptr;
-	}
+	} 
+	
 	GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, TEXT(" Object a ete drop "));
+	*/
 }
 
 

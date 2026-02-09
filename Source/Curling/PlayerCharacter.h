@@ -6,7 +6,6 @@
 #include "InputActionValue.h"
 #include "InputAction.h"
 #include "RockBase.h"
-
 #include "InputMappingContext.h"
 
 
@@ -24,6 +23,7 @@ class ARockBase;
 class ACurlingPlayerController;
 class ABroomBase;//Pour l'interaction avec le balai (Combat)
 class AFightingStone;//Pour l'interaction avec une pierre (Combat)
+class APickUpObject;
 UCLASS()
 class CURLING_API APlayerCharacter : public ACharacter
 {
@@ -137,14 +137,24 @@ protected:
 	// La fonction unique qui gère + et -
 	void AdjustRotation(const FInputActionValue& Value);
 	
+
+
 	
+
+	// Le Mesh de l'objet (Balai, Pierre, etc.)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UStaticMeshComponent* PickUpMesh;
 	// Si(nullptr) = mains vides.
 	// Sinon on tient un ballet.
+	/*
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Interaction")
 	ABroomBase* HeldBroom;
 	//Pour tenir une pierre
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Interaction")
 	AFightingStone* HeldFightingStone;
+	*/
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Interaction")
+	APickUpObject* HeldObject;
 
 	//test
 	void TestInput();

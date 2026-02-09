@@ -9,7 +9,9 @@ AFightingStone::AFightingStone()
 {
  	
 	PrimaryActorTick.bCanEverTick = false;
-
+	/*
+	* 
+	* Deja fais dans PickUpObject -> Polymorphisme
 	//creation mesh
 	FightingStoneMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("FightStoneMesh"));
 	RootComponent = FightingStoneMesh;
@@ -17,12 +19,13 @@ AFightingStone::AFightingStone()
 	//Simuler physics
 	FightingStoneMesh->SetSimulatePhysics(true);
 	FightingStoneMesh->SetCollisionProfileName(TEXT("PhysicsActor"));
+	*/
 
 	//Box de collision autour du balet
 	InteractionCollision = CreateDefaultSubobject<UBoxComponent>(TEXT("InteractionZoneCollision"));
-	InteractionCollision->SetupAttachment(FightingStoneMesh);
+	InteractionCollision->SetupAttachment(PickUpMesh);
 	//Taille de la collision
-	InteractionCollision->SetBoxExtent(FVector(20.f, 100.f, 20.f));//vector de type float
+	InteractionCollision->SetBoxExtent(FVector(20.f, 20.f, 20.f));//vector de type float
 	InteractionCollision->SetCollisionProfileName(TEXT("Trigger"));
 }
 
