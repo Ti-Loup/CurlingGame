@@ -309,6 +309,16 @@ void APlayerCharacter::QuandInteractionAppuyer() {
 		GetWorldTimerManager().SetTimer(TimerHandle_DropInteraction, this, &APlayerCharacter::DropObject, 1.0f, false);
 
 		if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Yellow, TEXT("Maintiens pour lâcher"));
+	} 
+	//si le personnage ne ramasse pas un Fightingstone
+	if (!HeldFightingStone) {
+		GrabObject();
+	}
+	else {
+		//Timer pour relacher la pierre
+		GetWorldTimerManager().SetTimer(TimerHandle_DropInteraction, this, &APlayerCharacter::DropObject, 1.0f, false);
+		if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Yellow, TEXT("Maintiens pour lâcher"));
+
 	}
 }
 
@@ -323,14 +333,18 @@ void APlayerCharacter::QuandInteractionRelacher() {
 void APlayerCharacter::GrabObject() {
 	// Si on tient déjà quelque chose, on ne fait rien 
 	if (HeldBroom) return;
+	if (HeldFightingStone) return;
 
+	//creation d'un array vide qui ajoute lorsque il y a contacte entre joueur et les acteurs 
 	TArray<AActor*> OverlappingActors;
 	GetOverlappingActors(OverlappingActors, ABroomBase::StaticClass());
+	GetOverlappingActors(OverlappingActors, AFightingStone::StaticClass());
 
-	if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Cyan, TEXT("J'ai trouvé un balai"));
+	if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Cyan, TEXT("J'ai trouvé un object"));
 	
 	for (AActor* Actor : OverlappingActors)
 	{
+		//Pour le balai
 		ABroomBase* RamasserLeBalais = Cast<ABroomBase>(Actor);
 		if (RamasserLeBalais)
 		{
@@ -347,6 +361,22 @@ void APlayerCharacter::GrabObject() {
 			if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Green, TEXT("Je tiens le balai"));
 			break;
 		}
+		//Pour tenir la pierre de combat
+		AFightingStone* RamasserLaPierre = Cast<AFightingStone>(Actor);
+		if (RamasserLaPierre) {
+			RamasserLaPierre->FightingStoneMesh->SetSimulatePhysics(false);
+			RamasserLaPierre->FightingStoneMesh->SetCollisionProfileName(TEXT("NoCollision"));
+
+			//attache
+			RamasserLaPierre->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, TEXT("Socket_FightingStone"));
+			//save
+			HeldFightingStone = RamasserLaPierre;
+
+
+			if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Green, TEXT("Je tien la pierre"));
+			break;
+		}
+
 	}
 
 
@@ -369,6 +399,15 @@ void APlayerCharacter::DropObject()
 
 		
 		HeldBroom = nullptr;
+	}
+	if (HeldFightingStone) {
+		HeldFightingStone->FightingStoneMesh->SetSimulatePhysics(true);
+
+		HeldFightingStone->FightingStoneMesh->SetCollisionProfileName(TEXT("PhysicsActor"));
+		HeldFightingStone->FightingStoneMesh->WakeAllRigidBodies();
+		HeldFightingStone->FightingStoneMesh->AddImpulse(GetActorForwardVector() * 50.0f, NAME_None, true);//constexpr Name_None
+
+		HeldFightingStone = nullptr;
 	}
 	GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, TEXT(" Object a ete drop "));
 }

@@ -22,7 +22,8 @@ enum class ECameraView : uint8
 //ajout de ARockBase pour connecter Le input de PlayerCharacter au RockBase 
 class ARockBase;
 class ACurlingPlayerController;
-class ABroomBase;
+class ABroomBase;//Pour l'interaction avec le balai (Combat)
+class AFightingStone;//Pour l'interaction avec une pierre (Combat)
 UCLASS()
 class CURLING_API APlayerCharacter : public ACharacter
 {
@@ -141,7 +142,9 @@ protected:
 	// Sinon on tient un ballet.
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Interaction")
 	ABroomBase* HeldBroom;
-
+	//Pour tenir une pierre
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Interaction")
+	AFightingStone* HeldFightingStone;
 
 	//test
 	void TestInput();
