@@ -102,6 +102,8 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 		Input->BindAction(IA_Interaction, ETriggerEvent::Completed, this, &APlayerCharacter::QuandInteractionRelacher);
 		Input->BindAction(IA_Interaction, ETriggerEvent::Canceled, this, &APlayerCharacter::QuandInteractionRelacher);
 
+		Input->BindAction(IA_Attack, ETriggerEvent::Triggered, this, &APlayerCharacter::Attack);
+
 	}
 	
 }
@@ -502,6 +504,26 @@ void APlayerCharacter::DropObject()
 	*/
 }
 
+//Fonction pour attaquer
+void APlayerCharacter::Attack() {
+
+	if (!isCurrentlyAttacking) {
+		isCurrentlyAttacking = true;
+
+		// test d'input
+		TestInput();
+
+		
+		// la durée en seconde de l'animation
+		GetWorldTimerManager().SetTimer(AttackTimerHandle, this, &APlayerCharacter::ResetAttack, 2.4f, false);
+	}
+	TestInput();
+}
+//Pour reset l'animation
+void APlayerCharacter::ResetAttack() {
+	
+	isCurrentlyAttacking = false;
+}
 
 
 //Utiliser pour verifier que les Inputs fonctionnaient bien et que ce n'etait pas un bug

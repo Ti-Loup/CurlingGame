@@ -113,7 +113,8 @@ protected:
 	class UInputAction* IA_ToggleCurl;
 	UPROPERTY(EditAnywhere, Category = "EnhancedInput")
 	class UInputAction* IA_Interaction;
-
+	UPROPERTY(EditAnywhere, Category = "EnhancedInput")
+	class UInputAction* IA_Attack;
 
 
 	// Camera
@@ -188,4 +189,10 @@ protected:
 	void QuandInteractionAppuyer();  // appuie
 	void QuandInteractionRelacher(); // relache
 	FTimerHandle TimerHandle_DropInteraction;//pour quand on relache e
+
+	void Attack();//fonction pour attaquer 
+	void ResetAttack();
+	UPROPERTY(BlueprintReadOnly, Category = "Abilities")
+	bool isCurrentlyAttacking = false;
+	FTimerHandle AttackTimerHandle;
 }; 
