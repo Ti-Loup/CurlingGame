@@ -73,18 +73,27 @@ void ACurlingPlayerController::SetCameraFollowPlayer() {
     APawn* PlayerPawn = GetPawn();
     if (!PlayerPawn) return;
 
-    SetViewTargetWithBlend(PlayerPawn, 0.5f);
+    // Transition douce vers le pawn
+    SetViewTargetWithBlend(PlayerPawn, 0.8f, VTBlend_Cubic);
+
     CameraState = ECameraState::FollowPlayer;
+    CurrentPlayerState = EPlayerState::FreeMove;
+
+    // Réactive le controle de rotation du joueur
+    SetIgnoreLookInput(false);
+    SetIgnoreMoveInput(false);
 }
 
 //Camera qui suit la pierre lorsque lancer
 void ACurlingPlayerController::SetCameraFollowStone(AActor* Stone)//On passe l'adresse de (l'actor de la pierre) a sa fonction
 {
-    if (!Stone) return;//exit si pas de pierre
+    if (!Stone) return;
 
-    SetViewTargetWithBlend(Stone, 0.5f);
+    // Désactive les inputs pendant que la pierre glisse
+    SetIgnoreLookInput(true);
+    SetIgnoreMoveInput(true);
+
+    SetViewTargetWithBlend(Stone, 0.5f, VTBlend_Cubic);
     CameraState = ECameraState::FollowStone;
-    
-
     
 }

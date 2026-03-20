@@ -98,9 +98,18 @@ void AMatchGameMode::StartEnd() {
 void AMatchGameMode::OnStonePlayed()
 {
     StonesPlayedThisEnd++; //0 de base 16 max
-
     // Changer d'équipe après chaque pierre
     CurrentTeam = (CurrentTeam == ETeam::Blue) ? ETeam::Red : ETeam::Blue;
+
+    // Remettre la caméra sur le joueur
+    for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
+    {
+        ACurlingPlayerController* playerController = Cast<ACurlingPlayerController>(It->Get());
+        if (playerController)
+        {
+            playerController->SetCameraFollowPlayer(); // remet en FollowPlayer
+        }
+    }
 
     // 16 pierres lancées = fin du bout
     if (StonesPlayedThisEnd >= StonesPerTeam * 2)
@@ -108,6 +117,7 @@ void AMatchGameMode::OnStonePlayed()
         MatchPhase = EMatchPhase::BetweenEnds;
         HandleBetweenEnds();//fonction appeler
     }
+
 }
 
 
