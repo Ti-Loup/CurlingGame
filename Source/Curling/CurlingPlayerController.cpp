@@ -79,6 +79,8 @@ void ACurlingPlayerController::SetCameraFollowPlayer() {
     CameraState = ECameraState::FollowPlayer;
     CurrentPlayerState = EPlayerState::FreeMove;
 
+    CurrentStone = nullptr;
+
     // Réactive le controle de rotation du joueur
     SetIgnoreLookInput(false);
     SetIgnoreMoveInput(false);
